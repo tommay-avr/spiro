@@ -3,6 +3,7 @@
 #include <avr/io.h>
 #include <util/delay.h>
 #include <util/delay_basic.h>
+#include <avr/fuse.h>
 #include <stdint.h>
 
 /*
@@ -139,6 +140,12 @@ main(void)
     }
   }
 }
+
+FUSES = {
+  // Might want to set BOD level.
+  .low = LFUSE_DEFAULT,
+  .high = HFUSE_DEFAULT,
+};
 
 /*
 x[n+1] = (x[n]*a + b) mod m
