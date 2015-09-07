@@ -4,9 +4,11 @@
 PROG=spiro
 SRCS=spiro.c
 
+OPT=-Os
+#OPT=-Os -mcall-prologues
+
 CC=avr-gcc
-#CFLAGS=-mmcu=attiny13 -std=gnu99 -Os -mcall-prologues -Wall -g
-CFLAGS=-mmcu=attiny13 -std=gnu99 -O2 -Wall -g
+CFLAGS=-mmcu=attiny13 -std=gnu99 -Wall -g $(OPT)
 
 all: $(PROG).hex $(PROG).lst
 

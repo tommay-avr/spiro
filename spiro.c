@@ -1,7 +1,8 @@
-#define F_CPU 9.6e6
+#define F_CPU (9.6e6 / 64)
 
 #include <avr/io.h>
 #include <util/delay.h>
+#include <util/delay_basic.h>
 #include <stdint.h>
 
 /*
@@ -43,7 +44,7 @@ int
 main(void)
 {
   // Clock is 9.6MHz.  Prescale by 64 to get 150kHz which allows
-  // us to use the ADC at the default prescale of 2 which gives
+  // us to use the ADC at the default prescale of /2 which gives
   // 75kHz which is within 50-200kHz.
   // Interrupts must be disabled for these two lines.  They are.
 
@@ -129,51 +130,11 @@ main(void)
 	  set_pwm(pwm);
 	}
 
-	/*
-	  0   -> 1/s    -> 10        10 / (N/32 + 1) => 320 / N  320
-	  32     2/s        5                                    10
-	  64     3          3.3                                  5
-	  96     4          2.5                                  3.3
-	  128 -> 5/s    ->  2                                    2.5
-	  160    6/s        1.7
-	  192    7/s        1.4
-	  224    8          1.1
-	  255 -> 10/s   ->  1
-
-	  Don't need a divide to see how many times to do the delay loop.
-	  The delay loop just does adds until it overflows, then exits.
-	  Or better yet, count down.
-	  Add 10 or something to adc so that things don't get too slow at the
-	  low end.  The delay loop speed can be tweaked by tweaking the number
-	  we count down from, by adding instructions to the loop, or by
-	  tweaking the clock speed.
-	*/
-
-	/* Each iteration of this loop takes 9 or 10 instruction cycles.
-	   Each instruction cycle takes four clock cycles.
-	   16MHz gives 4mips.
-	   For adc = 255, it takes 123 loop iterations.
-	   To ramp 128 pwm levels takes 128*123 = 15744 iterations
-	   =~ 157440 insns = prctically no time.  I'd like it to take
-	   about a tenth of a second.  (Actually I want it to take a tenth
-	   of a second regardless of how much it is changing I think.)
-	   Fosc clocks/sec =
-             4 clocks/insn * 10 insn/iter * 15744 iter/change * 10 change/sec
-             - 6.3m clocks/sec = 6.3 Mhz.  Sweet!
-	   So let's say we run at 4Mhz.  Or to save power(?), we can use a
-	   lower starting count and correspondingly slower clock speed.
-	   We can slow the clock down to 250KHz and decrease the counter
-	   to about 2K.
-	   We may need to tweak the clock speed for the PWM.  That's ok.
-           Double check:
-           2112 with counter = 265 requires 2112/265 = 7 iterations, or
-           70 insns.  To change pwm by 128 takes 7*128 = 896 =~ 900 iterations
-           = 9000 insns = 36000 clocks.  250kHz / 36000 = 6Hz, good!
-	*/
-
-        volatile int16_t counter = 6000;
+	int16_t counter = 0x2000;
 	int16_t counter_delta = (int16_t)read_adc() + 10;
-	while ((counter -= counter_delta) >= 0) {}
+	while ((counter -= counter_delta) >= 0) {
+	  _delay_loop_1(6);
+	}
       }
     }
   }
