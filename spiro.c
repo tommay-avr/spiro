@@ -52,11 +52,11 @@ main(void)
   CLKPR = _BV(CLKPCE);		// Enable prescaler to be set.
   CLKPR = 6;			// Divide by 64 (150kHz).
 
-  // Switch (PB3) is input (default) with pullup enabled.
+  // Switch (PB3) is input (default) with pull-up enabled.
 
-  PORTB |= _BV(PB3);		// Enable pullup.
+  PORTB |= _BV(PB3);		// Enable pull-up.
 
-  // Knob (PB2/ADC1) is input (default) with pullup disabled (default)
+  // Knob (PB2/ADC1) is input (default) with pull-up disabled (default)
   // and digital input buffer disabled.
 
   DIDR0 |= _BV(ADC1D);		// Disable digital input buffer.
@@ -83,7 +83,9 @@ main(void)
 
   DDRB |= _BV(DDB0);		// Pin 4 (OC0A) is output.
 
-  // XXX also disable buffer on any floating inputs.
+  // Enable pull-ups on unused/floating input pins.
+
+  PORTB |= _BV(PB1) | _BV(PB4) | _BV(PB5);
 
   uint8_t adc = read_adc();
   uint16_t rnd = adc << 8;	/* "Entropy". */
