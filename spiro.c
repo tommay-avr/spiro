@@ -7,9 +7,9 @@
 #include <stdint.h>
 
 /*
-  PB2/ADC1 pin 7: knob
-  PB3 pin 2: switch
   PB0/OCOA pin 5: motor pwm
+  PB3 pin 2: switch
+  PB4/ADC2 pin 3: knob
 */
 
 // If we make the PWM too low the motor will stop.  So we scale the
@@ -56,15 +56,15 @@ main(void)
 
   PORTB |= _BV(PB3);		// Enable pull-up.
 
-  // Knob (PB2/ADC1) is input (default) with pull-up disabled (default)
+  // Knob (PB4/ADC2) is input (default) with pull-up disabled (default)
   // and digital input buffer disabled.
 
-  DIDR0 |= _BV(ADC1D);		// Disable digital input buffer.
+  DIDR0 |= _BV(ADC2D);		// Disable digital input buffer.
 
   // ADC setup:
 
-  // Select ADC1.
-  ADMUX |= _BV(MUX0);
+  // Select ADC2.
+  ADMUX |= _BV(MUX1);
   // Left adjust ADC result so it appears in ADCH.
   ADMUX |= _BV(ADLAR);
   // Clock prescaler is /2 (default).
@@ -85,7 +85,7 @@ main(void)
 
   // Enable pull-ups on unused/floating input pins.
 
-  PORTB |= _BV(PB1) | _BV(PB4) | _BV(PB5);
+  PORTB |= _BV(PB1) | _BV(PB2) | _BV(PB5);
 
   uint8_t adc = read_adc();
   uint16_t rnd = adc << 8;	/* "Entropy". */
