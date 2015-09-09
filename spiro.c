@@ -12,10 +12,10 @@
   PB4/ADC2 pin 3: knob
 */
 
-// If we make the PWM too low the motor will stop.  So we scale the
-// values 0 -> 255 to PWM_MIN -> 255.  The average voltage from the
-// PWM is equal to the ADC voltage since they're both linear from 0 to
-// 3.3V.  PWM_MIN corresponds to 0.8V which makes sense since the
+// If we make the PWM width too low the motor will stop.  So we scale
+// the values 0 -> 255 to PWM_MIN -> 255.  The average voltage from
+// the PWM is equal to the ADC voltage since they're both linear from
+// 0 to 3.3V.  PWM_MIN corresponds to 0.8V which makes sense since the
 // motor is spec'd to run down to 1V.
 
 #define PWM_MIN (62)
@@ -77,9 +77,10 @@ main(void)
 
   TCCR0A = 0x83;
 
-  // Select clock = CPU/1 which starts the timer.
+  // Select clock = CPU/8 which starts the timer.  The PWM is
+  // 150kHz/8/256 = 73Hz.
 
-  TCCR0B |= _BV(CS00);
+  TCCR0B |= _BV(CS01);
 
   DDRB |= _BV(DDB0);		// Pin 4 (OC0A) is output.
 
