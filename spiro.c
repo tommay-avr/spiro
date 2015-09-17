@@ -44,13 +44,12 @@ scale_pwm(uint8_t in)
 int
 main(void)
 {
-  // Clock is 9.6MHz.  Prescale by 64 to get 150kHz which allows
-  // us to use the ADC at the default prescale of /2 which gives
-  // 75kHz which is within 50-200kHz.
+  // Clock is 9.6MHz.  Prescale by 16 to get 600kHz.  Remember to
+  // change TCCR0B and ADCSRA if this is changed.
   // Interrupts must be disabled for these two lines.  They are.
 
   CLKPR = _BV(CLKPCE);		// Enable prescaler to be set.
-  CLKPR = 6;			// Divide by 64 (150kHz).
+  CLKPR = 4;			// Divide by 16 (600kHz).
 
   // Switch (PB3) is input (default) with pull-up enabled.
 
@@ -67,7 +66,9 @@ main(void)
   ADMUX |= _BV(MUX1);
   // Left adjust ADC result so it appears in ADCH.
   ADMUX |= _BV(ADLAR);
-  // Clock prescaler is /2 (default).
+  // Clock prescaler is /8, ADC frequency is 600kHz / 8 = 75kHz
+  // (50-200kHz).
+  ADCSRA = 3;
   // Enable the ADC.
   ADCSRA |= _BV(ADEN);
 
@@ -78,7 +79,7 @@ main(void)
   TCCR0A = 0x83;
 
   // Select clock = CPU/8 which starts the timer.  The PWM is
-  // 150kHz/8/256 = 73Hz.
+  // 600kHz/8/256 = 293Hz.
 
   TCCR0B |= _BV(CS01);
 
