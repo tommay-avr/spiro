@@ -18,7 +18,7 @@
 // 0 to 3.3V.  PWM_MIN corresponds to 0.8V which makes sense since the
 // motor is spec'd to run down to 1V.
 
-#define PWM_MIN (62)
+#define PWM_MIN (0)
 
 static uint8_t
 read_adc(void)
