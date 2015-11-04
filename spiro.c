@@ -80,6 +80,7 @@ main(void)
 
   // Select clock = CPU/8 which starts the timer.  The PWM is
   // 600kHz/8/256 = 293Hz.
+  // Spec says 21kHz - 28kHz, nominal 25kHz.
 
   TCCR0B |= _BV(CS01);
 
@@ -93,6 +94,11 @@ main(void)
   uint16_t rnd = adc << 8;	/* "Entropy". */
 
   // Set the motor to full power briefly to make sure it starts up.
+
+  // The spec says 30% power for two seconds should start the fan.
+  // http://www.formfactors.org/developer%5Cspecs%5Crev1_2_public.pdf
+  // section 3.2.  But we're doing wonky stuff with the voltage level,
+  // so whatever works.
 
   uint8_t pwm = 0xFF;
   set_pwm(pwm);
